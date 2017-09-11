@@ -7,6 +7,7 @@
 "|       AUTHOR:  FalacerSelene                                              |
 "|      LICENCE:  Public Domain                                              |
 "|     PROVIDES:  :Systemate                                                 |
+"|                :IsSystemate                                               |
 "|                augroup Systemate                                          |
 "|                                                                           |
 "|===========================================================================|

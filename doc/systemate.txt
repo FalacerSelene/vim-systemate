@@ -1,0 +1,71 @@
+*systemate.txt*    Systemate - manage config across systems       *systemate*
+
+                             SYSTEMATE MANUAL
+                              VERSION: 0.0.1
+
+1. About Systemate                                |systemate-about|
+   1.1 Requirements                               |systemate-requirements|
+2. Quick Start                                    |systemate-quickstart|
+3. Commands                                       |systemate-commands|
+4. Configuration                                  |systemate-configuration|
+
+============================================================================
+1. ABOUT SYSTEMATE ~
+                                                            *systemate-about*
+
+1.1 REQUIREMENTS                                     *systemate-requirements*
+----------------
+
+Systemate requires Vim version 7.4 or later, and only loads if the
+'compatible' option is not set. It does not require Vim to be compiled with
+any particular plugin language support - but obviously requires the |+eval|
+feature.
+
+============================================================================
+2. QUICK START ~
+                                                       *systemate-quickstart*
+
+To start using systemate you need to set |g:systemate| in your vimrc. It
+should be a dict of names of styles to lists of settings which apply in that
+style. For example, if you wanted to set a style for use in the office which
+requires you to use tabs rather than spaces, you might set it as follows: >
+      let g:systemate = {}
+      let g:systemate.office = {
+        \   'settings' : {
+        \     '&l:expandtab': 0
+        \   }
+        \ }
+
+You would then be able to switch the settings on by running >
+      :Systemate office
+and off again by running >
+      :Systemate DEFAULT
+
+Alternatively, you can run |:Systemate| with no arguments to switch between
+the two. If you set multiple entries inside |g:systemate|, then you also have
+to specify |g:systemate_default| to be able to use the no-argument command.
+
+============================================================================
+3. COMMANDS ~
+                                                         *systemate-commands*
+
+*:Systemate*
+
+This command has 2 forms - with no arguments and with 1 arguments. The one
+arg form specifies a style to apply, where the style must exist in
+|g:systemate| and the special form `DEFAULT` undoes all currently applied
+styles.
+
+The 0 argument form does one of the following:
+- If a style is currently in effect it has the same effect as
+  `:Systemate DEFAULT`
+- If no style is in effect then it has the same effect as
+  `:execute 'Systemate' g:systemate_default`
+- If no style is in effect and |g:systemate_default| is not set, an error is
+  signalled.
+
+============================================================================
+4. CONFIGURATION ~
+                                                    *systemate-configuration*
+
+" vim: set expandtab sts=2 ts=2 sw=2 tw=77 cc=78 ft=help norl:

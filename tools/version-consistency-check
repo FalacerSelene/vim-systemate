@@ -16,12 +16,16 @@ declare vers_readme=$(sedx 'Version: \*([^*]*)\*' README.markdown)
 
 declare vers_addon=$(jq --raw-output '.version' addon-info.json)
 
-if [[ "${vers_readme}" != "${vers_addon}"  ]]
+declare vers_doc=$(sedx 'VERSION:\s*(\S*)' doc/systemate.txt)
+
+if [[ "${vers_readme}" != "${vers_addon}" ||
+      "${vers_readme}" != "${vers_doc}"   ]]
 then
 	cat >&2 <<-END_OF_ERROR
 	Version do not match!
 	    Readme        : |${vers_readme}|
 	    Addon         : |${vers_addon}|
+	    Documentation : |${vers_doc}|
 	END_OF_ERROR
 	exit 1
 fi
