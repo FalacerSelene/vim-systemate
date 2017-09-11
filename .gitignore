@@ -1,0 +1,7 @@
+GTAGS
+GRTAGS
+GPATH
+tags
+test/output/*.mst
+test/output/*.diff
+test/message

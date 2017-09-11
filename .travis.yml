@@ -1,0 +1,19 @@
+os: linux
+dist: trusty
+sudo: false
+language: lua
+
+addons:
+  apt:
+    packages:
+      - vim=2:7.4.052-1ubuntu3.1
+      - lua5.1
+      - lua-filesystem
+
+install: true
+
+script:
+  - ./run-regressions --suite all
+
+after_failure:
+  - ./test/print-diffs.sh

@@ -1,0 +1,16 @@
+#! /usr/bin/env bash
+
+if (( $# == 0 )) ; then
+	set -- --suite all
+fi
+
+if [[ -t 1 ]] ; then
+	declare colours='--colours'
+fi
+
+./test/regressions.lua            \
+    ${colours}                    \
+    --testdir   ./test            \
+    --vimrc     ./test/vimrc.vim  \
+    --suitefile ./test/suites.cfg \
+    "$@"                          ;

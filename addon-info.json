@@ -1,0 +1,12 @@
+{
+  "name": "vim-systemate",
+  "version": "0.0.1",
+  "author": "@FalacerSelene <git@falacer-selene.net>",
+  "maintainer": "@FalacerSelene <git@falacer-selene.net>",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/FalacerSelene/vim-systemate.git"
+  },
+  "dependencies": {},
+  "description": "Manage different configurations across multiple machines"
+}
