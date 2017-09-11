@@ -22,5 +22,3 @@ script:
 
 after_failure:
   - ./test/print-diffs.sh
-  - cat ./test/output/first_test.out
-  - cat ./test/output/first_test.mst
