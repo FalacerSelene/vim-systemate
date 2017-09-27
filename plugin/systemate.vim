@@ -198,7 +198,11 @@ function! s:InitialiseSystemate()
 	if !has_key(s:systemate.auto_apply, 'pc_name_match')
 		let l:issystem = 0
 	else
-		let s:host = systemlist('hostname')[0]
+		if exists('*systemlist')
+			let s:host = systemlist('hostname')[0]
+		else
+			let s:host = split(system('hostname'), "\n")[0]
+		fi
 		let l:issystem = s:host =~? s:systemate.auto_apply.pc_name_match
 	endif
 
