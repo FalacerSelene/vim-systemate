@@ -202,7 +202,7 @@ function! s:InitialiseSystemate()
 			let s:host = systemlist('hostname')[0]
 		else
 			let s:host = split(system('hostname'), "\n")[0]
-		fi
+		endif
 		let l:issystem = s:host =~? s:systemate.auto_apply.pc_name_match
 	endif
 
