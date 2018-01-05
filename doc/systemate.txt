@@ -7,7 +7,10 @@
    1.1 Requirements                               |systemate-requirements|
 2. Quick Start                                    |systemate-quickstart|
 3. Commands                                       |systemate-commands|
+   3.1 :Systemate                                 |:Systemate|
 4. Configuration                                  |systemate-configuration|
+5. Functions                                      |systemate-functions|
+   5.1 systemate#CurrentStyle()                   |systemate#CurrentStyle()|
 
 ============================================================================
 1. ABOUT SYSTEMATE ~
@@ -53,19 +56,30 @@ to specify |g:systemate_default| to be able to use the no-argument command.
 
 This command has 2 forms - with no arguments and with 1 arguments. The one
 arg form specifies a style to apply, where the style must exist in
-|g:systemate| and the special form `DEFAULT` undoes all currently applied
-styles.
+|g:systemate| and the setting are configured as described in the
+|systemate-configuration| section of this manual.
 
 The 0 argument form does one of the following:
-- If a style is currently in effect it has the same effect as
-  `:Systemate DEFAULT`
+- If a style is currently in effect it unsets the currently active style.
 - If no style is in effect then it has the same effect as
   `:execute 'Systemate' g:systemate_default`
 - If no style is in effect and |g:systemate_default| is not set, an error is
   signalled.
 
+The 0 argument form also accepts a bang - `:Systemate!`. This always unsets
+any currently active style.
+
 ============================================================================
 4. CONFIGURATION ~
                                                     *systemate-configuration*
+
+============================================================================
+5. FUNCTIONS ~
+                                                        *systemate-functions*
+
+systemate#CurrentStyle()                           *systemate#CurrentStyle()*
+
+Returns the name of the currently active style, or the empty string if no
+style is currently active.
 
 " vim: set expandtab sts=2 ts=2 sw=2 tw=77 cc=78 ft=help norl:

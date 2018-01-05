@@ -5,7 +5,7 @@
 "|  DESCRIPTION:  Manage Company-specific settings.                          |
 "|                                                                           |
 "|       AUTHOR:  FalacerSelene                                              |
-"|      LICENCE:  Public Domain                                              |
+"|      LICENCE:  Unlicense                                                  |
 "|     PROVIDES:  :Systemate                                                 |
 "|                :IsSystemate                                               |
 "|                augroup Systemate                                          |
@@ -73,13 +73,10 @@ augroup SystemateInit
 	autocmd VimEnter * silent call <SID>InitialiseSystemate()
 augroup END
 
+"|===========================================================================|
+"|                              USER COMMANDS                                |
+"|===========================================================================|
 command! -nargs=0 -bar Systemate call <SID>ToggleSystemate()
-command! -nargs=0 -bar IsSystemate
-	\   if get(b:, 'SystemateStyle', 0)
-	\ |   echon "yes"
-	\ | else
-	\ |   echon "no"
-	\ | endif
 
 "|===========================================================================|
 "|                                FUNCTIONS                                  |
