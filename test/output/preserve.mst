@@ -1,0 +1,10 @@
+-- Start of Test --
+
+Test that attributes in the DEFAULT are restored
+==============================================================================
+Check values before setting
+Foo = 20
+Foo = 10
+Foo = 20
+==============================================================================
+-- End of Test --

@@ -1,0 +1,16 @@
+-- Start of Test --
+
+Test the multiple separate attributes can be used and reset
+==============================================================================
+Check values before setting
+Foo = <UNSET>, Bar = <UNSET>
+==============================================================================
+Set style one
+Foo = 4, Bar = <UNSET>
+Foo = <UNSET>, Bar = <UNSET>
+==============================================================================
+Set style two
+Foo = <UNSET>, Bar = 8
+Foo = <UNSET>, Bar = <UNSET>
+==============================================================================
+-- End of Test --

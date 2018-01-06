@@ -5,15 +5,12 @@ function Say(...) abort
 	echomsg string(a:000)
 	for l:arg in a:000
 		if type(l:arg) == type('')
-			echomsg "1" l:arg
 			call append('$', l:arg)
-		elseif type(a:text) == type([])
-			echomsg "2"
+		elseif type(l:arg) == type([])
 			for l:line in l:arg
 				call append('$', l:line)
 			endfor
 		else
-			echomsg "3"
 			call append('$', string(l:arg))
 		endif
 	endfor
@@ -116,7 +113,6 @@ command -bar -nargs=1 UseCase
  \   let b:case_firstline = line('$') + 1
  \ | call append('$', GetCase(<args>))
  \ | let b:case_lastline = line('$')
-command -bar -nargs=0 NormalStyle let g:CommentableBlockStyle = ['/*', '*', '*/']
 command -bar -nargs=0 SayException
  \   Say 'Caught exception!'
  \ | Say v:exception

@@ -3,4 +3,5 @@ GRTAGS
 GPATH
 tags
 test/output/*.diff
+test/output/*.out
 test/message

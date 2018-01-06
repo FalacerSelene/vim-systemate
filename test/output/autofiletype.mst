@@ -1,0 +1,11 @@
+-- Start of Test --
+
+Test that systemate correctly auto-activates when restricted
+==============================================================================
+Value of foo - should be none
+<UNSET>
+==============================================================================
+Set filetype, which should trigger the autoapply
+1
+==============================================================================
+-- End of Test --

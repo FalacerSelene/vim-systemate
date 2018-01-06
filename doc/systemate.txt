@@ -9,8 +9,16 @@
 3. Commands                                       |systemate-commands|
    3.1 :Systemate                                 |:Systemate|
 4. Configuration                                  |systemate-configuration|
+   4.1 User Configuration                         |systemate-user-configuration|
+   4.2 Variables Listing                          |systemate-variables|
+       4.2.1 g:systemate                          |g:systemate|
+       4.2.2 g:systemate_default                  |g:systemate_default|
+       4.2.3 b:systemate_style                    |b:systemate_style|
 5. Functions                                      |systemate-functions|
    5.1 systemate#CurrentStyle()                   |systemate#CurrentStyle()|
+6. Errors                                         |systemate-errors|
+   6.1 BADCONFIG                                  |BADCONFIG|
+   6.2 NOSUCHSTYLE                                |NOSUCHSTYLE|
 
 ============================================================================
 1. ABOUT SYSTEMATE ~
@@ -21,8 +29,7 @@
 
 Systemate requires Vim version 7.4 or later, and only loads if the
 'compatible' option is not set. It does not require Vim to be compiled with
-any particular plugin language support - but obviously requires the |+eval|
-feature.
+any particular plugin language support.
 
 ============================================================================
 2. QUICK START ~
@@ -63,7 +70,10 @@ The 0 argument form does one of the following:
 - If a style is currently in effect it unsets the currently active style.
 - If no style is in effect then it has the same effect as
   `:execute 'Systemate' g:systemate_default`
-- If no style is in effect and |g:systemate_default| is not set, an error is
+  if |g:systemate_default| is set, otherwise it has the same effect as
+  `:execute 'Systemate' values(g:systemate)[0]`
+- If no style is in effect, |g:systemate_default| is not set, and there is
+  not exactly one style set in |g:systemate|, a |BADCONFIG| error is
   signalled.
 
 The 0 argument form also accepts a bang - `:Systemate!`. This always unsets
@@ -73,6 +83,23 @@ any currently active style.
 4. CONFIGURATION ~
                                                     *systemate-configuration*
 
+4.1 USER CONFIGURATION                         *systemate-user-configuration*
+----------------------
+
+4.2 VARIABLES LISTING                                   *systemate-variables*
+---------------------
+
+This sections describes all the (non-s:, non-l:) variables used by systemate.
+
+g:systemate                                                     *g:systemate*
+
+g:systemate_default                                     *g:systemate_default*
+
+The following configuration settings are used internally and should not
+normally be set.
+
+b:systemate_style                                         *b:systemate_style*
+
 ============================================================================
 5. FUNCTIONS ~
                                                         *systemate-functions*
@@ -81,5 +108,41 @@ systemate#CurrentStyle()                           *systemate#CurrentStyle()*
 
 Returns the name of the currently active style, or the empty string if no
 style is currently active.
+
+============================================================================
+6. ERRORS ~
+                                                           *systemate-errors*
+
+This section documents all the errors which may be thrown during normal
+operation. It does not include any native errors. All errors follow the
+pattern >
+    Systemate:ERRORNAMEINCAPS:Error detail
+
+Therefore you can catch errors as follows >
+
+    try
+      systemate#DoSystemateThing()
+    catch /^Systemate:.*/
+      let [l:_, l:error_type, l:error_detail] =
+        \ match(v:exception, '^Systemate:\([^:]*\):\(.*\)')
+      echoerr 'Got error of type' l:error_type
+      echoerr 'Error detail:' l:error_detail
+    endtry
+
+The following strings may occur as the error_type.
+
+BADCONFIG                                                         *BADCONFIG*
+
+This exception is thrown when some bit of config is invalid - for example
+when `g:systemate` is an empty dictionary or when `%NULL%` is used for a `&`
+prefixed setting.
+
+NOSUCHSTYLE                                                     *NOSUCHSTYLE*
+
+This exception is throw when the user attempts to set a style which is not
+present in `g:systemate`. For example >
+
+    let g:systemate = { "office": { "settings": { "&l:expandtab": 1 } } }
+    Systemate foo
 
 " vim: set expandtab sts=2 ts=2 sw=2 tw=77 cc=78 ft=help norl:
