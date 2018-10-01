@@ -126,9 +126,10 @@ endfunction
 "|===========================================================================|
 function! systemate#StyleSelectionDialogue() abort
 	let l:styles = <SID>StyleList()
-	call map(l:styles, {i, ss -> i . ': ' . ss})
-	let l:styles = join(l:styles, "\n")
-	let l:selection = input(l:styles . "\n? ", '')
+	let l:choices = copy(l:styles)
+	call map(l:choices, {i, ss -> i . ': ' . ss})
+	let l:choices = join(l:choices, "\n")
+	let l:selection = input(l:choices . "\n? ", '')
 	let l:num = str2nr(l:selection)
 
 	if l:selection ==# ''
