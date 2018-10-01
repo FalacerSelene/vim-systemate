@@ -35,6 +35,8 @@ augroup END
 "|                              USER COMMANDS                                |
 "|===========================================================================|
 command! -nargs=? -bar Systemate call systemate#SystemateCommand(<q-args>)
+command! -nargs=0 -bar SystemateName call <SID>PrintCurrentName()
+command! -nargs=0 -bar SystemateSelect call <SID>SystemateSelect()
 
 "|===========================================================================|
 "|                                FUNCTIONS                                  |
@@ -94,3 +96,32 @@ endfunction
 "|===========================================================================|
 "| }}}                                                                       |
 "|===========================================================================|
+
+"|===========================================================================|
+"| s:PrintCurrentName() {{{                                                  |
+"|===========================================================================|
+function! s:PrintCurrentName() abort
+	let l:name = systemate#CurrentStyleName()
+	if empty(l:name)
+		echo 'Systemate off'
+	else
+		echo 'Systemate:' l:name
+	endif
+endfunction
+"|===========================================================================|
+"| }}}                                                                       |
+"|===========================================================================|
+
+"|===========================================================================|
+"| s:SystemateSelect() {{{                                                   |
+"|===========================================================================|
+function! s:SystemateSelect() abort
+	let l:style = systemate#StyleSelectionDialogue()
+	if !empty(l:style)
+		call systemate#ApplyForFiletype(&l:filetype, l:style)
+	endif
+endfunction
+"|===========================================================================|
+"| }}}                                                                       |
+"|===========================================================================|
+

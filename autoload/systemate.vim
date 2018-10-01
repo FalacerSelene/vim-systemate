@@ -33,6 +33,16 @@ endfunction
 "|===========================================================================|
 
 "|===========================================================================|
+"| systemate#CurrentStyleName() {{{                                          |
+"|===========================================================================|
+function! systemate#CurrentStyleName() abort
+	return get(get(b:, 'systemate_style', {}), 'name', '')
+endfunction
+"|===========================================================================|
+"| }}}                                                                       |
+"|===========================================================================|
+
+"|===========================================================================|
 "| systemate#Toggle(filetype, style) {{{                                     |
 "|===========================================================================|
 function! systemate#Toggle(filetype, style) abort
@@ -57,7 +67,7 @@ endfunction
 function! systemate#ApplyForFiletype(filetype, style) abort
 	let l:default = a:style ==# 'DEFAULT'
 	let l:cur_style = get(b:, 'systemate_style', {})
-	let l:cur_style_name = get(l:cur_style, "name", '')
+	let l:cur_style_name = get(l:cur_style, 'name', '')
 	let l:cur_on = l:cur_style != {}
 
 	if l:default && !l:cur_on
@@ -76,7 +86,7 @@ function! systemate#ApplyForFiletype(filetype, style) abort
 		"|------------------------------------------------
 		unlet b:systemate_style
 
-		for [l:item, l:value] in items(l:cur_style["revert"])
+		for [l:item, l:value] in items(l:cur_style.revert)
 			call <SID>SetValue(l:item, l:value)
 		endfor
 
@@ -92,7 +102,7 @@ function! systemate#ApplyForFiletype(filetype, style) abort
 			let l:current[l:item] = <SID>GetValue(l:item)
 		endfor
 
-		let b:systemate_style = {"name": a:style, "revert": l:current}
+		let b:systemate_style = {'name': a:style, 'revert': l:current}
 
 		for [l:item, l:value] in items(l:toapply)
 			call <SID>SetValue(l:item, l:value)
@@ -104,8 +114,34 @@ function! systemate#ApplyForFiletype(filetype, style) abort
 		"| Already set, set to something alse
 		"|------------------------------------------------
 
-		throw "Systemate:NOTYETIMPLEMENTED"
+		throw 'Systemate:NOTYETIMPLEMENTED'
 	endif
+endfunction
+"|===========================================================================|
+"| }}}                                                                       |
+"|===========================================================================|
+
+"|===========================================================================|
+"| systemate#StyleSelectionDialogue() {{{                                    |
+"|===========================================================================|
+function! systemate#StyleSelectionDialogue() abort
+	let l:styles = <SID>StyleList()
+	call map(l:styles, {i, ss -> i . ': ' . ss})
+	let l:styles = join(l:choices, "\n")
+	let l:selection = input(l:styles . "\n? ", '')
+	let l:num = str2nr(l:selection)
+
+	if l:selection ==# ''
+		return ''
+	elseif match(l:selection, '^\v\s*\d+\s*$') == -1
+		echoerr 'Doesn''t look like a number:' l:num
+		return ''
+	elseif l:num > len(l:styles)
+		echoerr 'Invalid selection:' l:num
+		return ''
+	endif
+
+	return l:styles[l:num]
 endfunction
 "|===========================================================================|
 "| }}}                                                                       |
@@ -151,12 +187,11 @@ endfunction
 "| }}}                                                                       |
 "|===========================================================================|
 
-
 "|===========================================================================|
 "| s:GetDefaultStyle() {{{                                                   |
 "|===========================================================================|
 function! s:GetDefaultStyle() abort
-	let l:styles = keys(get(g:, 'systemate', {}))
+	let l:styles = <SID>StyleList()
 	if has_key(g:, 'systemate_default')
 		return g:sytemate_default
 	elseif len(l:styles) == 1
@@ -169,6 +204,9 @@ endfunction
 "| }}}                                                                       |
 "|===========================================================================|
 
+"|===========================================================================|
+"| s:SetValue(name, value) {{{                                               |
+"|===========================================================================|
 function! s:SetValue(name, value) abort
 	if a:value ==# '%NULL%'
 		if strpart(a:name, 0, 1) == '&'
@@ -181,7 +219,7 @@ function! s:SetValue(name, value) abort
 			execute 'unlet!' a:name
 		endif
 	elseif strpart(a:name, 0, 1) == '&'
-		if type(a:value) == type(".")
+		if type(a:value) == type('.')
 			let l:q = printf("'%s'", a:value)
 			execute 'let' a:name '=' l:q
 		else
@@ -191,12 +229,18 @@ function! s:SetValue(name, value) abort
 		let {a:name} = a:value
 	endif
 endfunction
+"|===========================================================================|
+"| }}}                                                                       |
+"|===========================================================================|
 
+"|===========================================================================|
+"| s:GetValue(name) {{{                                                      |
+"|===========================================================================|
 function! s:GetValue(name) abort
 	if strpart(a:name, 0, 1) == '&'
 		let l:val = eval(a:name)
 		if l:val == '' && strpart(a:name, 0, 3) ==# '&l:'
-			let l:val = eval(printf("&%s", strpart(a:name, 3)))
+			let l:val = eval(printf('&%s', strpart(a:name, 3)))
 		endif
 		return l:val
 	else
@@ -207,3 +251,16 @@ function! s:GetValue(name) abort
 		endtry
 	endif
 endfunction
+"|===========================================================================|
+"| }}}                                                                       |
+"|===========================================================================|
+
+"|===========================================================================|
+"| s:StyleList() {{{                                                         |
+"|===========================================================================|
+function! s:StyleList() abort
+	return keys(get(g:, 'systemate', {}))
+endfunction
+"|===========================================================================|
+"| }}}                                                                       |
+"|===========================================================================|
