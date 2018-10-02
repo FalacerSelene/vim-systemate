@@ -4,10 +4,10 @@
 "|                                                                           |
 "|  DESCRIPTION:  Manage Company-specific settings.                          |
 "|                                                                           |
-"|       AUTHOR:  FalacerSelene                                              |
-"|      LICENCE:  Unlicense                                                  |
-"|     PROVIDES:  :Systemate                                                 |
-"|                augroup Systemate                                          |
+"|       AUTHOR:  @FalacerSelene                                             |
+"|      CONTACT:  < git at falacer-selene dot net >                          |
+"|      LICENCE:  See LICENCE.md                                             |
+"|      VERSION:  0.1.0                                                      |
 "|                                                                           |
 "|===========================================================================|
 
@@ -18,9 +18,13 @@ scriptencoding utf-8
 
 if &compatible || exists('g:loaded_systemate')
 	finish
+elseif v:version < 704
+	echoerr 'Systemate requires vim 7.4 or later!'
 endif
 
 let g:loaded_systemate = 1
+let g:systemate_version = '0.1.0'
+lockvar g:systemate_version
 
 "|===========================================================================|
 "|                             USER INTERFACE                                |
