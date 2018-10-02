@@ -21,11 +21,18 @@ let s:ft_saved = {}
 "|===========================================================================|
 function! systemate#SystemateCommand(style) abort
 	if a:style != ''
-		call systemate#Toggle(&l:filetype, a:style)
+		let l:style = a:style
 	elseif get(b:, 'systemate_style', {}) != {}
-		call systemate#Toggle(&l:filetype, 'DEFAULT')
+		let l:style = 'DEFAULT'
 	else
-		call systemate#Toggle(&l:filetype, <SID>GetDefaultStyle())
+		let l:style = <SID>GetDefaultStyle()
+	endif
+
+	let l:new_style = systemate#ApplyForFiletype(&l:filetype, l:style)
+	if l:new_style ==# ''
+		echo 'Systemate Unset'
+	else
+		echo 'Systemate Set:' l:new_style
 	endif
 endfunction
 "|===========================================================================|
@@ -37,21 +44,6 @@ endfunction
 "|===========================================================================|
 function! systemate#CurrentStyleName() abort
 	return get(get(b:, 'systemate_style', {}), 'name', '')
-endfunction
-"|===========================================================================|
-"| }}}                                                                       |
-"|===========================================================================|
-
-"|===========================================================================|
-"| systemate#Toggle(filetype, style) {{{                                     |
-"|===========================================================================|
-function! systemate#Toggle(filetype, style) abort
-	let l:new_style = systemate#ApplyForFiletype(a:filetype, a:style)
-	if l:new_style ==# ''
-		echo 'Systemate Unset'
-	else
-		echo 'Systemate Set:' l:new_style
-	endif
 endfunction
 "|===========================================================================|
 "| }}}                                                                       |

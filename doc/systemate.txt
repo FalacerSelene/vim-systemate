@@ -100,14 +100,39 @@ normally be set.
 
 b:systemate_style                                         *b:systemate_style*
 
+The currently in-effect style & settings
+
 ============================================================================
 5. FUNCTIONS ~
                                                         *systemate-functions*
 
-systemate#CurrentStyle()                           *systemate#CurrentStyle()*
-
+systemate#CurrentStyleName()                   *systemate#CurrentStyleName()*
+>
+    let g:cur_style = systemate#CurrentStyleName()
+<
 Returns the name of the currently active style, or the empty string if no
 style is currently active.
+
+systemate#ApplyForFiletype()                   *systemate#ApplyForFiletype()*
+>
+    call systemate#ApplyForFiletype(filetype, style)
+<
+Apply a given named style for a given filetype. If the style does not exist,
+then it will throw an error.
+
+systemate#StyleSelectionDialogue()       *systemate#StyleSelectionDialogue()*
+>
+    let g:selected = systemate#StyleSelectionDialogue()
+<
+Open a style selection dialogue and get the user to select from all currently
+available style names. Return the selected name.
+
+systemate#SystemateCommand()                   *systemate#SystemateCommand()*
+>
+    call systemate#SystemateCommand(style)
+<
+Run a command as given with the `:Systemate` command, where `style` is the
+single argument accepted by |:Systemate|
 
 ============================================================================
 6. ERRORS ~
