@@ -17,7 +17,7 @@ before_script:
   - vim --version
 
 script:
-  - ./tools/version-consistency-check
+  - ./version-check.lua
   - ./run-regressions --suite all
 
 after_failure:
