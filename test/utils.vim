@@ -102,6 +102,18 @@ function EndTest() abort
 	quitall!
 endfunction
 
+function Asserte(...)
+	let l:str = join(a:000)
+	try
+		let l:ret = eval(l:str)
+		if !l:ret
+			Say printf('Failed %d: %s', l:ret, a:str)
+		endif
+	catch
+		SayException
+	endtry
+endfunction
+
 "|===========================================================================|
 "| Commands                                                                  |
 "|===========================================================================|
@@ -116,5 +128,6 @@ command -bar -nargs=1 UseCase
 command -bar -nargs=0 SayException
  \   Say 'Caught exception!'
  \ | Say v:exception
-command -nargs=* Assertq try | execute <q-args> | catch | SayException | endtry
+command -nargs=* AssertQ try | execute <q-args> | catch | SayException | endtry
 command -nargs=* Assert try | execute <args> | catch | SayException | endtry
+command -nargs=* AssertE call Asserte(<f-args>)

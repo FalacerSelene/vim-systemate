@@ -4,8 +4,10 @@ Test that systemate correctly auto-activates when restricted
 ==============================================================================
 Value of foo - should be none
 <UNSET>
+Check current style name
 ==============================================================================
 Set filetype, which should trigger the autoapply
 1
+Check style name got set
 ==============================================================================
 -- End of Test --

@@ -4,8 +4,14 @@ Test that systemate correctly auto-activates
 ==============================================================================
 Value of foo - should be autoactivated
 1
+Check current style name
+Caught exception!
+Vim(call):E121: Undefined variable: a:str
 ==============================================================================
 Deactive and check again
 <UNSET>
+Check style name got set
+Caught exception!
+Vim(call):E121: Undefined variable: a:str
 ==============================================================================
 -- End of Test --
