@@ -1,0 +1,49 @@
+#! /usr/bin/env lua
+
+local io, os = require('io'), require('os')
+
+local function match(pattern, file) -- {{{
+	for line in io.lines(file) do
+		local _, _, found = line:find(pattern)
+		if found then
+			return found
+		end
+	end
+end -- }}}
+
+local function resolve(pats) -- {{{
+	local same = true
+	local first = nil
+	local found = {}
+	for _, pat in ipairs(pats) do
+		local got = match(pat.pattern, pat.file)
+		if not first then
+			first = got
+		elseif first ~= got then
+			same = false
+		end
+		found[pat.name] = got
+	end
+
+	return found, same
+end -- }}}
+
+local pats = {
+	{name='Readme', file='README.markdown', pattern='Version:%s*%*([^%*]*)%*'},
+	{name='Plugin', file='plugin/systemate.vim', pattern='g:systemate_version%s*=%s*\'([^\']*)\''},
+	{name='Addon', file='addon-info.json', pattern='"version":%s*"([^"]*)"'},
+	{name='Documentation', file='doc/systemate.txt', pattern='VERSION:%s*(%S*)'},
+	{name='Comment', file='plugin/systemate.vim', pattern='VERSION:%s*(%S*)'},
+}
+
+local found, same = resolve(pats)
+
+if not same then
+	print('Version mismatch!')
+	for name, value in pairs(found) do
+		print(string.format('\t%s: %s', name, value))
+	end
+	os.exit(1)
+end
+
+os.exit(0)
