@@ -61,7 +61,7 @@ function! s:InitialiseSystemate() abort
 		let l:autoapply = l:style['auto_apply']
 
 		if has_key(l:autoapply, 'pc_name_match')
-		 \ && systemlist('hostname')[0] !~? l:autoapply['pc_name_match']
+		 \ && hostname() !~? l:autoapply['pc_name_match']
 			"|------------------------------------------------
 			"| We're restricting by pc_name and this is not
 			"| the right name. Wait for manual.
