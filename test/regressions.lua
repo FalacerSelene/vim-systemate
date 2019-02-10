@@ -6,11 +6,12 @@
 --[ ANSI terminal colours for pretty output.                               ]--
 --[========================================================================]--
 
-local escape = string.char(27)
-local ansi_red   = escape .. '[31m' .. escape .. '[1m'
-local ansi_green = escape .. '[32m' .. escape .. '[1m'
-local ansi_blue  = escape .. '[34m' .. escape .. '[1m'
-local ansi_end   = escape .. '[m'
+local escape      = string.char(27)
+local ansi_red    = escape .. '[31m' .. escape .. '[1m'
+local ansi_green  = escape .. '[32m' .. escape .. '[1m'
+local ansi_yellow = escape .. '[33m' .. escape .. '[1m'
+local ansi_blue   = escape .. '[34m' .. escape .. '[1m'
+local ansi_end    = escape .. '[m'
 
 local function remove_colours ()
 	ansi_red = ''
@@ -446,6 +447,8 @@ local function main (args)
 		remove_colours()
 	end
 
+	print(ansi_yellow .. '===== START OF TESTS =====' .. ansi_end)
+
 	local successcount = 0
 	local failurecount = 0
 	local failures = {}
@@ -470,13 +473,15 @@ local function main (args)
 		end
 	end
 
+	print(ansi_yellow .. '===== END OF TESTS =====' .. ansi_end)
+
 	print(ansi_blue .. "TOTAL" .. ansi_end .. ":\t" .. (successcount + failurecount))
 	print(ansi_blue .. "SUCCESSES" .. ansi_end .. ":\t" .. successcount)
 
 	if failurecount == 0 then
-		print(ansi_green .. "FAILURES:" .. ansi_end .. "\t" .. failurecount)
+		print(ansi_green .. "FAILURES" .. ansi_end .. ":\t" .. failurecount)
 	else
-		print(ansi_red .. "FAILURES:" .. ansi_end .. "\t" .. failurecount)
+		print(ansi_red .. "FAILURES" .. ansi_end .. ":\t" .. failurecount)
 	end
 
 	if notfoundcount > 0 then
