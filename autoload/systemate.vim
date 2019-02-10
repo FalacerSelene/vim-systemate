@@ -99,6 +99,7 @@ function! systemate#ApplyForFiletype(filetype, style) abort
 
 		for [l:item, l:value] in items(l:toapply)
 			call <SID>SetValue(l:item, l:value)
+			unlet l:value
 		endfor
 
 		return a:style
@@ -165,6 +166,7 @@ function! s:SettingsForFiletype(filetype, style) abort
 	let l:settingset = {}
 	for [l:k, l:v] in items(get(g:systemate[a:style], 'settings', {}))
 		let l:settingset[l:k] = l:v
+		unlet l:v
 	endfor
 
 	if has_key(g:systemate[a:style], 'per_filetype')
@@ -172,6 +174,7 @@ function! s:SettingsForFiletype(filetype, style) abort
 		  \                         a:filetype,
 		  \                         {}))
 			let l:settingset[l:k] = l:v
+			unlet l:v
 		endfor
 	endif
 

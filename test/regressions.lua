@@ -137,6 +137,7 @@ local function parseargs (args)
 	local STATE_TESTDIR = 2
 	local STATE_VIMRC   = 3
 	local STATE_SUITES  = 4
+	local STATE_VIMBIN  = 5
 	local state         = STATE_NORM
 
 	local lastarg = nil
@@ -152,7 +153,9 @@ local function parseargs (args)
 				state = STATE_VIMRC
 			elseif arg == '-f' or arg == '--suitefile' then
 				state = STATE_SUITES
-			elseif arg == '-c' or arg == '--colours' then
+			elseif arg == '-b' or arg == '--vimbinary' then
+				state = STATE_VIMBIN
+			elseif arg == '-c' or arg == '--colours'   then
 				addarg('use_colours', true, true)
 			else
 				addarg('tests', arg)
@@ -168,6 +171,9 @@ local function parseargs (args)
 			state = STATE_NORM
 		elseif state == STATE_SUITES  then
 			addarg('suitefile', arg, true)
+			state = STATE_NORM
+		elseif state == STATE_VIMBIN  then
+			addarg('vimbin', arg, true)
 			state = STATE_NORM
 		else
 			error("Programming error in parseargs()")
@@ -344,7 +350,14 @@ end
 --[ runsingletest (name, args) {{{                                         ]--
 --[========================================================================]--
 local function runsingletest (name, args)
-	local vimcmd = "vim -E -n -N"
+	local vimbin
+	if args.vimbin then
+		vimbin = args.vimbin
+	else
+		vimbin = "vim"
+	end
+
+	local vimcmd = vimbin .. " -E -n -N"
 	if args.vimrc then
 		local curdir = os.getenv("PWD")
 		vimcmd = vimcmd .. " -u '" .. curdir .. '/' .. args.vimrc .. "'"
