@@ -4,11 +4,15 @@ Test that systemate correctly activates
 ==============================================================================
 Value of foo before activating
 <UNSET>
+Value of bar
+'<UNSET>'
 ==============================================================================
-Activate and check foo again
+Activate and check both again
 1
+['one', 'two']
 ==============================================================================
 Deactive and check last time
 <UNSET>
+'<UNSET>'
 ==============================================================================
 -- End of Test --

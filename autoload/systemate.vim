@@ -199,10 +199,27 @@ endfunction
 "|===========================================================================|
 
 "|===========================================================================|
+"| s:IsNullValue(value) {{{                                                  |
+"|===========================================================================|
+function! s:IsNullValue(value) abort
+	if type(a:value) == type('.') && a:value ==# '%NULL%'
+		return 1
+	elseif exists('v:none') && type(a:value) == type(v:none)
+	 \     && (a:value == v:none || a:value == v:null)
+		return 1
+	else
+		return 0
+	endif
+endfunction
+"|===========================================================================|
+"| }}}                                                                       |
+"|===========================================================================|
+
+"|===========================================================================|
 "| s:SetValue(name, value) {{{                                               |
 "|===========================================================================|
 function! s:SetValue(name, value) abort
-	if a:value ==# '%NULL%'
+	if <SID>IsNullValue(a:value)
 		if strpart(a:name, 0, 1) == '&'
 			if strpart(a:name, 0, 3) == '&l:'
 				execute printf('set %s<', strpart(a:name, 3))

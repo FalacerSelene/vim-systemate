@@ -26,6 +26,7 @@ version number is tracked in the file `addon-info.json`.
 
 ### Fixed
 - Now correctly autoapplies settings at start of day.
+- Fixed a bug with reverting settings which are not strings.
 
 [0.1.0]
 -------
