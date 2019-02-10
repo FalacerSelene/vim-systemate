@@ -72,7 +72,7 @@ function! s:InitialiseSystemate() abort
 
 		return l:aprio - l:bprio
 	endfunction
-	call sort(l:auto, funcref('<SID>SortAuto'))
+	call sort(l:auto, function('<SID>SortAuto'))
 	delfunction s:SortAuto
 
 	"|------------------------------------------------
@@ -92,7 +92,7 @@ function! s:InitialiseSystemate() abort
 		endif
 		return l:applies
 	endfunction
-	call filter(l:auto, funcref('<SID>AppliesHere'))
+	call filter(l:auto, function('<SID>AppliesHere'))
 	delfunction s:AppliesHere
 
 	if empty(l:auto)
