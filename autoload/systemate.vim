@@ -57,6 +57,7 @@ endfunction
 "|   set.                                                                    |
 "|===========================================================================|
 function! systemate#ApplyForFiletype(filetype, style) abort
+	let l:filetype = a:filetype ==# '*' ? &l:filetype : a:filetype
 	let l:default = a:style ==# 'DEFAULT'
 	let l:cur_style = get(b:, 'systemate_style', {})
 	let l:cur_style_name = get(l:cur_style, 'name', '')
@@ -87,7 +88,7 @@ function! systemate#ApplyForFiletype(filetype, style) abort
 		"|------------------------------------------------
 		"| Already DEFAULT, set to something else
 		"|------------------------------------------------
-		let l:toapply = <SID>SettingsForFiletype(a:filetype, a:style)
+		let l:toapply = <SID>SettingsForFiletype(l:filetype, a:style)
 		let l:current = {}
 
 		for l:item in keys(l:toapply)

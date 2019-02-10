@@ -1,6 +1,6 @@
 -- Start of Test --
 
-Test that systemate correctly auto-activates
+Test that systemate correctly auto-activates with star filetype
 ==============================================================================
 Value of foo - should be autoactivated
 1

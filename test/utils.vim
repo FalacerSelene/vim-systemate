@@ -107,7 +107,7 @@ function Asserte(...)
 	try
 		let l:ret = eval(l:str)
 		if !l:ret
-			Say printf('Failed %d: %s', l:ret, a:str)
+			Say printf('Failed %d: %s', l:ret, l:str)
 		endif
 	catch
 		SayException

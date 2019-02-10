@@ -4,7 +4,7 @@ Say 'Test that systemate correctly auto-activates when restricted'
 let g:systemate = {}
 let g:systemate.only = {}
 let g:systemate.only.settings = { 't:foo': 1 }
-let g:systemate.only.auto_apply = { 'for_filetypes': ['foo'] }
+let g:systemate_autoapply = { 'only': { 'filetypes': ['foo'] } }
 
 doautocmd SystemateInit VimEnter *
 

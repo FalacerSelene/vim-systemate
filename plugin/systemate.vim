@@ -50,50 +50,86 @@ command! -nargs=0 -bar SystemateSelect call <SID>SystemateSelect()
 "| s:InitialiseSystemate() {{{                                               |
 "|===========================================================================|
 function! s:InitialiseSystemate() abort
+	if !has_key(g:, 'systemate_autoapply')
+		"|------------------------------------------------
+		"| Nothing to autoapply, so there is no loading
+		"| to do.
+		"|------------------------------------------------
+		return
+	endif
+
 	let l:systemate = get(g:, 'systemate', {})
+
+	let l:auto = items(g:systemate_autoapply)
+
+	"|------------------------------------------------
+	"| First, sort the autoapply settings according
+	"| to their priority
+	"|------------------------------------------------
+	function! s:SortAuto(a, b) abort
+		let l:aprio = get(a:a[1], 'priority', 0)
+		let l:bprio = get(a:b[1], 'priority', 0)
+
+		return l:aprio - l:bprio
+	endfunction
+	call sort(l:auto, funcref('<SID>SortAuto'))
+	delfunction s:SortAuto
+
+	"|------------------------------------------------
+	"| Then, filter for only ones that fit matching
+	"| rules currently in effect.
+	"|------------------------------------------------
+	function! s:AppliesHere(idx, style)
+		let l:rules = a:style[1]
+		let l:applies = 1
+		if has_key(l:rules, 'hostname')
+			if !exists('s:hostname')
+				let s:hostname = hostname()
+			endif
+			if s:hostname !~? s:hostname
+				let l:applies = 0
+			endif
+		endif
+		return l:applies
+	endfunction
+	call filter(l:auto, funcref('<SID>AppliesHere'))
+	delfunction s:AppliesHere
+
+	if empty(l:auto)
+		"|------------------------------------------------
+		"| There were none left, so no autoapply to do.
+		"|------------------------------------------------
+		return
+	endif
+
+	let [l:style_name, l:rules] = l:auto[0]
+
+	let l:fts = get(l:rules, 'filetypes', ['*'])
+	let l:star = index(l:fts, '*') != -1
+
 	augroup Systemate
 	autocmd!
 
-	for [l:style_name, l:style] in items(l:systemate)
-		if !has_key(l:style, 'auto_apply')
-			"|------------------------------------------------
-			"| No auto_apply settings. Wait for manual.
-			"|------------------------------------------------
-			return
-		endif
-
-		let l:autoapply = l:style['auto_apply']
-
-		if has_key(l:autoapply, 'pc_name_match')
-		 \ && hostname() !~? l:autoapply['pc_name_match']
-			"|------------------------------------------------
-			"| We're restricting by pc_name and this is not
-			"| the right name. Wait for manual.
-			"|------------------------------------------------
-			return
-		endif
-
-		let l:filetypes = get(l:autoapply, 'for_filetypes', [])
-
-		if empty(l:filetypes)
-			let l:filetypes = ['*']
-		endif
-
-		for l:ft in l:filetypes
+	if l:star
+		execute 'autocmd' 'FileType' '*' 'silent' 'call'
+		 \      printf('systemate#ApplyForFiletype("*", "%s")', l:style_name)
+		silent call systemate#ApplyForFiletype('*', l:style_name)
+	else
+		for l:ft in l:fts
 			execute 'autocmd' 'FileType' l:ft 'silent' 'call'
 			 \      printf('systemate#ApplyForFiletype("%s", "%s")',
 			 \             l:ft,
 			 \             l:style_name)
-
+	
 			"|------------------------------------------------
 			"| The filetype command won't fire at start of
 			"| day, so fire it now if need be.
 			"|------------------------------------------------
-			if &l:filetype ==# l:ft || l:filetypes == ['*']
+			if &l:filetype ==# l:ft
 				silent call systemate#ApplyForFiletype(&l:filetype, l:style_name)
 			endif
 		endfor
-	endfor
+	endif
 
 	augroup END
 endfunction
@@ -128,4 +164,3 @@ endfunction
 "|===========================================================================|
 "| }}}                                                                       |
 "|===========================================================================|
-

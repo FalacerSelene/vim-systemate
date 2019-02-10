@@ -95,6 +95,8 @@ g:systemate                                                     *g:systemate*
 
 g:systemate_default                                     *g:systemate_default*
 
+g:systemate_autoapply                                 *g:systemate_autoapply*
+
 The following configuration settings are used internally and should not
 normally be set.
 
