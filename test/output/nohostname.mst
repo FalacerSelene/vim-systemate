@@ -1,0 +1,9 @@
+-- Start of Test --
+
+Test that systemate does not react to other hostnames
+==============================================================================
+Value of foo - should not be set
+<UNSET>
+Check current style name
+==============================================================================
+-- End of Test --

@@ -86,7 +86,7 @@ function! s:InitialiseSystemate() abort
 			if !exists('s:hostname')
 				let s:hostname = hostname()
 			endif
-			if s:hostname !~? s:hostname
+			if s:hostname !~? l:rules.hostname
 				let l:applies = 0
 			endif
 		endif

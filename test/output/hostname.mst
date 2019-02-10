@@ -1,0 +1,9 @@
+-- Start of Test --
+
+Test that systemate detects hostnames
+==============================================================================
+Value of foo - should be autoactivated
+1
+Check current style name
+==============================================================================
+-- End of Test --
