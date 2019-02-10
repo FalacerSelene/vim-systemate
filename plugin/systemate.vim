@@ -72,14 +72,14 @@ function! s:InitialiseSystemate() abort
 
 		return l:aprio - l:bprio
 	endfunction
-	call sort(l:auto, function('<SID>SortAuto'))
+	call sort(l:auto, '<SID>SortAuto')
 	delfunction s:SortAuto
 
 	"|------------------------------------------------
 	"| Then, filter for only ones that fit matching
 	"| rules currently in effect.
 	"|------------------------------------------------
-	function! s:AppliesHere(idx, style)
+	function! s:AppliesHere(style)
 		let l:rules = a:style[1]
 		let l:applies = 1
 		if has_key(l:rules, 'hostname')
@@ -92,7 +92,7 @@ function! s:InitialiseSystemate() abort
 		endif
 		return l:applies
 	endfunction
-	call filter(l:auto, function('<SID>AppliesHere'))
+	call filter(l:auto, '<SID>AppliesHere(v:val)')
 	delfunction s:AppliesHere
 
 	if empty(l:auto)
