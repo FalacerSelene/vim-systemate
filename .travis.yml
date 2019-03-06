@@ -9,12 +9,15 @@ addons:
       - vim=2:7.4.052-1ubuntu3.1
       - lua5.1
       - lua-filesystem
+      - luarocks
       - jq
 
 install: true
 
 before_script:
   - vim --version
+  - luarocks install --local argparse
+  - eval $(luarocks path)
 
 script:
   - ./version-check

@@ -31,13 +31,9 @@ end
 --[ trying to run/open them. However, I can still shell out instead, so    ]--
 --[ LFS isn't mandatory.                                                   ]--
 --[========================================================================]--
-local function req (modname)
-	local mod = nil
-	pcall(function () mod = require(modname) end)
-	return mod
-end
-
-local lfs = req('lfs')
+local argparse = require('argparse')
+local lfs = nil
+pcall(function () lfs = require('lfs') end)
 
 if not lfs then
 	print('Warning - running without lfs.')
