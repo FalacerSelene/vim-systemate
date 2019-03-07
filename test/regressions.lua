@@ -2,22 +2,18 @@
 
 --[========================================================================]--
 --[ Colours {{{                                                            ]--
---[                                                                        ]--
---[ ANSI terminal colours for pretty output.                               ]--
 --[========================================================================]--
 
-local escape      = string.char(27)
-local ansi_red    = escape .. '[31m' .. escape .. '[1m'
-local ansi_green  = escape .. '[32m' .. escape .. '[1m'
-local ansi_yellow = escape .. '[33m' .. escape .. '[1m'
-local ansi_blue   = escape .. '[34m' .. escape .. '[1m'
-local ansi_end    = escape .. '[m'
+local ansi = {}
+setmetatable(ansi, {__index = function() return '' end})
 
-local function remove_colours ()
-	ansi_red = ''
-	ansi_green = ''
-	ansi_blue = ''
-	ansi_end = ''
+local function usecolours()
+	local e = string.char(27)
+	ansi.red    = e .. '[31m' .. e .. '[1m'
+	ansi.green  = e .. '[32m' .. e .. '[1m'
+	ansi.yellow = e .. '[33m' .. e .. '[1m'
+	ansi.blue   = e .. '[34m' .. e .. '[1m'
+	ansi.stop   = e .. '[m'
 end
 
 --[========================================================================]--
@@ -26,10 +22,6 @@ end
 
 --[========================================================================]--
 --[ Modules {{{                                                            ]--
---[                                                                        ]--
---[ I use LFS later on to check that tests and directories exist before    ]--
---[ trying to run/open them. However, I can still shell out instead, so    ]--
---[ LFS isn't mandatory.                                                   ]--
 --[========================================================================]--
 local argparse = require('argparse')
 local lfs = nil
@@ -45,61 +37,37 @@ end
 --[========================================================================]--
 
 --[========================================================================]--
---[ isdir (dirname) {{{                                                    ]--
+--[ isdir/isfile (name) {{{                                                ]--
 --[                                                                        ]--
 --[ Description:                                                           ]--
---[   Does the specified directory exist, and is it a directory?           ]--
+--[   Does the specified dir/file exist, and is it a dir/file?             ]--
 --[                                                                        ]--
 --[ Params:                                                                ]--
---[   1) dirname - dir to check                                            ]--
+--[   1) name - dir/file to check                                          ]--
 --[                                                                        ]--
 --[ Returns:                                                               ]--
 --[   1) true/false                                                        ]--
 --[========================================================================]--
 
-local function isdir (dirname)
-	local isdir = false
-	local diratts
-
-	if lfs then
-		diratts = lfs.attributes(dirname)
-		isdir = diratts and diratts.mode == 'directory'
-	elseif os.execute('[ -d "' .. dirname .. '" ]') then
-		isdir = true
-	end
-
-	return isdir
+local function lfsmode (name, mode)
+	local atts = lfs.attributes(name)
+	return atts and atts.mode == mode
 end
 
---[========================================================================]--
---[ }}}                                                                    ]--
---[========================================================================]--
-
---[========================================================================]--
---[ isfile (filename) {{{                                                  ]--
---[                                                                        ]--
---[ Description:                                                           ]--
---[   Does the specified file exist, and is it a normal file?              ]--
---[                                                                        ]--
---[ Params:                                                                ]--
---[   1) filename - file to check                                          ]--
---[                                                                        ]--
---[ Returns:                                                               ]--
---[   1) true/false                                                        ]--
---[========================================================================]--
+local function isdir (dirname)
+	if lfs then
+		return lfsmode(dirname, 'directory')
+	else
+		return os.execute('test -d "' .. dirname .. '"') == 0
+	end
+end
 
 local function isfile (filename)
-	local isfile = false
-	local fileatts
-
 	if lfs then
-		fileatts = lfs.attributes(filename)
-		isfile = fileatts and fileatts.mode == 'file'
-	elseif os.execute('[ -f "' .. filename .. '" ]') then
-		isfile = true
+		return lfsmode(filename, 'file')
+	else
+		return os.execute('test -f "' .. filename .. '"') == 0
 	end
-
-	return isfile
 end
 
 --[========================================================================]--
@@ -110,119 +78,32 @@ end
 --[ parseargs (args) {{{                                                   ]--
 --[========================================================================]--
 local function parseargs (args)
-	local parsed = {}
+	local parser = argparse('regressions.lua', 'Regression test runner')
 
-	local function addarg (name, elem, uniq)
-		if parsed[name] == nil then
-			if uniq then
-				parsed[name] = elem
-			else
-				parsed[name] = {elem}
-			end
-		else
-			if uniq then
-				error("Multiple instances of unique argument --" .. name)
-			else
-				local l = parsed[name]
-				l[#l+1] = elem
-			end
-		end
-	end
+	parser:flag('-c --colours', 'Should colours be used on output?'):action(usecolours)
+	parser:option('-s --suite', 'Whole suites to run'):count('*'):target('suites')
+	parser:option('-d --testdir', 'Test base directory')
+	parser:option('-v --vimrc', 'Vimrc file to use')
+	parser:option('-f --suitefile', 'Suite definition file')
+	parser:option('-b --vimbinary', 'Binary to use for testing'):target('vimbin')
+	parser:argument('tests', 'Individual tests to run'):args('*')
 
-	local STATE_NORM    = 0
-	local STATE_SUITE   = 1
-	local STATE_TESTDIR = 2
-	local STATE_VIMRC   = 3
-	local STATE_SUITES  = 4
-	local STATE_VIMBIN  = 5
-	local state         = STATE_NORM
+	local parsed = parser:parse(args)
 
-	local lastarg = nil
-
-	for _, arg in ipairs(args) do
-		lastarg = arg
-		if     state == STATE_NORM    then
-			if     arg == '-s' or arg == '--suite'     then
-				state = STATE_SUITE
-			elseif arg == '-d' or arg == '--testdir'   then
-				state = STATE_TESTDIR
-			elseif arg == '-v' or arg == '--vimrc'     then
-				state = STATE_VIMRC
-			elseif arg == '-f' or arg == '--suitefile' then
-				state = STATE_SUITES
-			elseif arg == '-b' or arg == '--vimbinary' then
-				state = STATE_VIMBIN
-			elseif arg == '-c' or arg == '--colours'   then
-				addarg('use_colours', true, true)
-			else
-				addarg('tests', arg)
-			end
-		elseif state == STATE_SUITE   then
-			addarg('suites', arg)
-			state = STATE_NORM
-		elseif state == STATE_TESTDIR then
-			addarg('testdir', arg, true)
-			state = STATE_NORM
-		elseif state == STATE_VIMRC   then
-			addarg('vimrc', arg, true)
-			state = STATE_NORM
-		elseif state == STATE_SUITES  then
-			addarg('suitefile', arg, true)
-			state = STATE_NORM
-		elseif state == STATE_VIMBIN  then
-			addarg('vimbin', arg, true)
-			state = STATE_NORM
-		else
-			error("Programming error in parseargs()")
-		end
-	end
-
-	if state ~= STATE_NORM then
-		error("Missing mandatory argument to arg: " .. lastarg)
-	elseif not parsed.testdir then
+	-- And now do some validity checking.
+	if not parsed.testdir then
 		error("Missing mandatory arg --testdir")
-	elseif parsed.suites and not parsed.suitefile then
+	elseif (#parsed.suites ~= 0) and not parsed.suitefile then
 		error("Option --suites requires a --suitefile")
-	end
-
-	if not parsed.suites then
-		parsed.suites = {}
-	end
-
-	if not parsed.tests then
-		parsed.tests = {}
+	elseif not isdir(parsed.testdir) then
+		error("Could not find directory: " .. parsed.testdir)
+	elseif parsed.vimrc and not isfile(parsed.vimrc) then
+		error("Could not find file: " .. parsed.vimrc)
+	elseif parsed.suitefile and not isfile(parsed.suitefile) then
+		error("Could not find file: " .. parsed.suitefile)
 	end
 
 	return parsed
-end
---[========================================================================]--
---[ }}}                                                                    ]--
---[========================================================================]--
-
---[========================================================================]--
---[ assertfilesexist (args) {{{                                            ]--
---[                                                                        ]--
---[ Description:                                                           ]--
---[   Assert that the files given by command line argements exist.         ]--
---[                                                                        ]--
---[ Params:                                                                ]--
---[   1) args - The command line arguments.                                ]--
---[                                                                        ]--
---[ Returns:                                                               ]--
---[   1) The same arguments as passed in. Errors if any of the required    ]--
---[      files do not exist.                                               ]--
---[========================================================================]--
-local function assertfilesexist (args)
-	if not isdir(args.testdir) then
-		error("Could not find directory: " .. args.testdir)
-	elseif args.vimrc and
-	       not isfile(args.vimrc) then
-		error("Could not find file: " .. args.vimrc)
-	elseif args.suitefile and
-	       not isfile(args.suitefile) then
-		error("Could not find file: " .. args.suitefile)
-	end
-	return(args)
 end
 --[========================================================================]--
 --[ }}}                                                                    ]--
@@ -437,13 +318,9 @@ end
 --[ main (args) {{{                                                        ]--
 --[========================================================================]--
 local function main (args)
-	local args = assertfilesexist(parseargs(args))
+	local args = parseargs(args)
 
-	if not args.use_colours then
-		remove_colours()
-	end
-
-	print(ansi_yellow .. '===== START OF TESTS =====' .. ansi_end)
+	print(ansi.yellow .. '===== START OF TESTS =====' .. ansi.stop)
 
 	local successcount = 0
 	local failurecount = 0
@@ -453,35 +330,35 @@ local function main (args)
 	local _, test
 	for _, test in ipairs(testlistfromargs(args)) do
 		if not isfile(args.testdir .. "/scripts/" .. test .. ".vim") then
-			print(test .. "... " .. ansi_red .. "NOTFOUND" .. ansi_end)
+			print(test .. "... " .. ansi.red .. "NOTFOUND" .. ansi.stop)
 			notfoundcount = notfoundcount + 1
 			notfound[#notfound+1] = test
 		else
 			local passed = runsingletest(test, args)
 			if passed then
-				print(test .. "... " .. ansi_green .. "PASSED" .. ansi_end)
+				print(test .. "... " .. ansi.green .. "PASSED" .. ansi.stop)
 				successcount = successcount + 1
 			else
-				print(test .. "... " .. ansi_red .. "FAILED" .. ansi_end)
+				print(test .. "... " .. ansi.red .. "FAILED" .. ansi.stop)
 				failurecount = failurecount + 1
 				failures[#failures+1] = test
 			end
 		end
 	end
 
-	print(ansi_yellow .. '===== END OF TESTS =====' .. ansi_end)
+	print(ansi.yellow .. '===== END OF TESTS =====' .. ansi.stop)
 
-	print(ansi_blue .. "TOTAL" .. ansi_end .. ":\t" .. (successcount + failurecount))
-	print(ansi_blue .. "SUCCESSES" .. ansi_end .. ":\t" .. successcount)
+	print(ansi.blue .. "TOTAL" .. ansi.stop .. ":\t" .. (successcount + failurecount))
+	print(ansi.blue .. "SUCCESSES" .. ansi.stop .. ":\t" .. successcount)
 
 	if failurecount == 0 then
-		print(ansi_green .. "FAILURES" .. ansi_end .. ":\t" .. failurecount)
+		print(ansi.green .. "FAILURES" .. ansi.stop .. ":\t" .. failurecount)
 	else
-		print(ansi_red .. "FAILURES" .. ansi_end .. ":\t" .. failurecount)
+		print(ansi.red .. "FAILURES" .. ansi.stop .. ":\t" .. failurecount)
 	end
 
 	if notfoundcount > 0 then
-		print(ansi_red .. "NOTFOUND" .. ansi_end .. ":\t" .. notfoundcount)
+		print(ansi.red .. "NOTFOUND" .. ansi.stop .. ":\t" .. notfoundcount)
 	end
 
 	if failurecount == 0 and notfoundcount == 0 then
