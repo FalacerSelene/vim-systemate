@@ -1,5 +1,11 @@
 #! /usr/bin/env bash
 
+if [[ -n "${LUA_PATH}" ]] ; then
+	declare -x LUA_PATH="./test/lua-modules/?.lua;${LUA_PATH}"
+else
+	declare -x LUA_PATH='./test/lua-modules/?.lua'
+fi
+
 if (( $# == 0 )) ; then
 	set -- --suite all
 fi
