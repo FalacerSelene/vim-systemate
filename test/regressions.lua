@@ -134,7 +134,12 @@ local function runsingletest (name, args)
 	if isfile(mstfilename) and isfile(outfilename) then
 		local cmd = string.format('diff %s %s > %s 2>/dev/null',
 		                          outfilename, mstfilename, diffilename)
-		passed = os.execute(cmd) == 0
+		local vers = tonumber(string.sub(_VERSION, 7))
+		if vers <= 1 then
+			passed = os.execute(cmd) == 0
+		else
+			passed = os.execute(cmd)
+		end
 	else
 		passed = false
 	end
