@@ -205,10 +205,10 @@ endfunction
 "| s:IsNullValue(value) {{{                                                  |
 "|===========================================================================|
 function! s:IsNullValue(value) abort
-	if type(a:value) == type('.') && a:value ==# '%NULL%'
+	let l:type = type(a:value)
+	if l:type == type('.') && a:value ==# '%NULL%'
 		return 1
-	elseif exists('v:none') && type(a:value) == type(v:none)
-	 \     && (a:value == v:none || a:value == v:null)
+	elseif exists('v:t_none') && l:type == v:t_none
 		return 1
 	else
 		return 0
